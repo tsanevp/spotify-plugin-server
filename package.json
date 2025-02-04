@@ -1,0 +1,24 @@
+{
+  "name": "spotify-plugin-server",
+  "version": "1.0.0",
+  "description": "server for spotify-plugin",
+  "keywords": [
+    "server",
+    "node"
+  ],
+  "homepage": "https://github.com/tsanevp/spotify-plugin-server#readme",
+  "bugs": {
+    "url": "https://github.com/tsanevp/spotify-plugin-server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsanevp/spotify-plugin-server.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
