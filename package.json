@@ -25,6 +25,7 @@
     "dev": "run-p index.js start"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "express": "^4.21.2"
   },
   "devDependencies": {
