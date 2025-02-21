@@ -7,6 +7,21 @@ export default function UserRoutes(app) {
   const spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
   const verifier = generateCodeVerifier(128);
 
+  app.get('/user/profile', async (req, res) => {
+    try {
+      const response = await axios.get("https://api.spotify.com/v1/me", {
+        headers: {
+          'Authorization': `Bearer ${global.myVar}`
+        }
+      });
+
+      res.json(response.data);
+    } catch (error) {
+      console.error('Error fetching user profile:', error.response?.data || error.message);
+      res.status(error.response?.status || 500).json({ error: error.response?.data || 'Internal Server Error' });
+    }
+  });
+
   app.get('/auth/login', async (req, res) => {
     const challenge = await generateCodeChallenge(verifier);
     const params = new URLSearchParams();
