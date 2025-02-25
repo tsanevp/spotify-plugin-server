@@ -45,13 +45,18 @@ export default function PlaylistRoutes(app) {
     const getPlaylistTracks = async (req, res) => {
         try {
             const { pid } = req.params;
+            let offset = req.query.offset;
+
+            if (!offset) {
+                offset = '0';
+            }
 
             if (!pid) {
                 return res.status(400).json({ error: 'Missing required parameter: playlist_id' });
             }
 
             const response = await axios.get(
-                `https://api.spotify.com/v1/playlists/${pid}/tracks`,
+                `https://api.spotify.com/v1/playlists/${pid}/tracks?offset=${offset}&limit=100`,
                 {
                     headers: {
                         'Authorization': `Bearer ${global.myVar}`
