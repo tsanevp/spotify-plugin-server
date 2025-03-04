@@ -1,11 +1,15 @@
 import axios from 'axios';
+import refreshAccessToken from '../tokenManager.js';
 
 export default function SearchRoutes(app) {
-    app.get('/search', async (req, res) => {
+    const searchRoutes = async (req, res, firstCall = true) => {
         try {
-            const { q, type, market, limit, offset, include_external } = req.query;
+            const access_token = req.session.access_token;
+            if (!access_token) {
+                return res.status(401).json({ error: 'User not authenticated' });
+            }
 
-            // Validate required parameters
+            const { q, type, market, limit, offset, include_external } = req.query;
             if (!q || !type) {
                 return res.status(400).json({ error: 'Missing required parameters: q and type' });
             }
@@ -22,15 +26,26 @@ export default function SearchRoutes(app) {
             const response = await axios.get('https://api.spotify.com/v1/search', {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${global.myVar}`
+                    'Authorization': `Bearer ${access_token}`
                 },
                 params
             });
 
             res.json(response.data);
         } catch (error) {
-            console.error('Error fetching search results:', error.response?.data || error.message);
-            res.status(error.response?.status || 500).json({ error: error.response?.data || 'Internal Server Error' });
+            if (error.message && error.status === 401 && firstCall) {
+                const newAccessToken = await refreshAccessToken(req, res);
+                if (newAccessToken) {
+                    searchRoutes(req, res, false);
+                } else {
+                    return res.status(401).json({ error: 'Unable to refresh access token' });
+                }
+            } else {
+                console.error('Error fetching search results:', error.response?.data || error.message);
+                res.status(error.response?.status || 500).json({ error: error.response?.data || 'Internal Server Error' });
+            }
         }
-    });
+    };
+
+    app.get('/search', searchRoutes);
 }
