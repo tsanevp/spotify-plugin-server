@@ -28,7 +28,7 @@ export default function SearchRoutes(app) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${access_token}`
                 },
-                params
+                params: params
             });
 
             res.json(response.data);

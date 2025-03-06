@@ -10,7 +10,6 @@ export default function UserRoutes(app) {
   const getUserProfile = async (req, res, firstCall = true) => {
     try {
       const access_token = req.session.access_token;
-      console.log(access_token);
       if (!access_token) {
         return res.status(401).json({ error: 'User not authenticated' });
       }
@@ -79,7 +78,7 @@ export default function UserRoutes(app) {
     params.append("client_id", spotify_client_id);
     params.append("response_type", "code");
     params.append("redirect_uri", "http://localhost:5000/callback");
-    params.append("scope", "user-read-private user-read-email playlist-read-private user-top-read");
+    params.append("scope", "user-read-private user-read-email playlist-read-private user-top-read playlist-modify-public playlist-modify-private");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
 
@@ -90,9 +89,6 @@ export default function UserRoutes(app) {
     try {
       const code = req.query.code;
       const verifier = req.session.code_verifier
-
-      console.log("verify", verifier);
-
       if (!verifier) {
         return res.status(400).send('Code verifier not found in session');
       }
@@ -123,8 +119,6 @@ export default function UserRoutes(app) {
         req.session.access_token = access_token;
         req.session.refresh_token = refresh_token;
 
-        console.log("SDFLSDJFSLDKF", req.session.access_token);
-
         res.redirect("http://localhost:5173/callback?success=true");
       } else
       {
@@ -132,7 +126,7 @@ export default function UserRoutes(app) {
       }
     } catch (error) {
       console.error('Error getting access token:', error.response ? error.response.data : error.message);
-      res.status(500).send('Authentication failed');
+      res.redirect("http://localhost:5173/callback?success=false");
     }
   };
 

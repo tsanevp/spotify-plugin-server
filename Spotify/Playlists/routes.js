@@ -13,7 +13,6 @@ export default function PlaylistRoutes(app) {
             if (!uid) {
                 return res.status(400).json({ error: 'Missing required parameter: user_id' });
             }
-
             const response = await axios.post(
                 `https://api.spotify.com/v1/users/${uid}/playlists`,
                 req.body,
@@ -25,7 +24,20 @@ export default function PlaylistRoutes(app) {
                 }
             );
 
-            res.json(response.data);
+            const { tracks } = req.body;
+            const playlistId = response.data.id;
+            const trackChunks = splitArrayIntoChunks(tracks, 100);
+
+            const addTrackPromises = trackChunks.map((trackChunk) =>
+                addSongsToPlaylist(req, playlistId, trackChunk)
+            );
+            await Promise.all(addTrackPromises);
+
+            // Send the final response after all tracks are added
+            res.json({
+                message: 'Playlist created successfully',
+                playlistId: playlistId,
+            })
         } catch (error) {
             if (error.message && error.status === 401 && firstCall) {
                 const newAccessToken = await refreshAccessToken(req, res);
@@ -38,6 +50,39 @@ export default function PlaylistRoutes(app) {
                 console.error('Error creating user playlist:', error.response?.data || error.message);
                 res.status(error.response?.status || 500).json({ error: error.response?.data || 'Internal Server Error' });
             }
+        }
+    };
+
+    function splitArrayIntoChunks(array, chunkSize) {
+        const result = [];
+        for (let i = 0; i < array.length; i += chunkSize) {
+            result.push(array.slice(i, i + chunkSize));
+        }
+        return result;
+    }
+
+    const addSongsToPlaylist = async (req, playlistId, tracks) => {
+        try {
+            const access_token = req.session.access_token;
+            if (!access_token) {
+                throw new Error('User not authenticated');
+            }
+
+            const response = await axios.post(
+                `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+                { uris: tracks },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${access_token}`,
+                    },
+                }
+            );
+
+            return response.data;
+        } catch (error) {
+            console.error('Error adding tracks to playlist:', error.response?.data || error.message);
+            throw new Error(error.response?.data || 'Error adding tracks');
         }
     };
 

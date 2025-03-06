@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 import UserRoutes from './Spotify/Users/routes.js';
 import PlaylistRoutes from './Spotify/Playlists/routes.js';
 import SearchRoutes from './Spotify/Search/routes.js';
+import ServerRoutes from './Spotify/Server/routes.js';
 
 const port = 5000
 config()
@@ -36,9 +37,11 @@ if (process.env.NODE_ENV !== "development") {
     };
 }
 app.use(session(sessionOptions));
+app.use(express.json());
 
 UserRoutes(app);
 PlaylistRoutes(app);
 SearchRoutes(app);
+ServerRoutes(app);
 
 app.listen(port);
