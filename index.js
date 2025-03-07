@@ -28,11 +28,16 @@ const sessionOptions = {
     }
 };
 
+const domain = process.env.NODE_SERVER_DOMAIN ? process.env.NODE_SERVER_DOMAIN.trim() : ""
+console.log("THIS IS MY DOMAIN: ", domain);
+
 if (process.env.NODE_ENV !== "development") {
     sessionOptions.proxy = true;
     sessionOptions.cookie = {
-        sameSite: "none",
+        httpOnly: true,
         secure: true,
+        sameSite: "none",
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
         domain: process.env.NODE_SERVER_DOMAIN,
     };
 }
