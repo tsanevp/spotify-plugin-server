@@ -6,6 +6,7 @@ export default function UserRoutes(app) {
   const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
   const spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
   const node_server_url = process.env.NODE_SERVER_URL;
+  const hosting_url = process.env.HOSTING_URL;
   const TOP_TYPES = new Set("artists", "tracks");
 
   const getUserProfile = async (req, res, firstCall = true) => {
@@ -120,14 +121,14 @@ export default function UserRoutes(app) {
         req.session.access_token = access_token;
         req.session.refresh_token = refresh_token;
 
-        res.redirect("http://localhost:5173/callback?success=true");
+        res.redirect(`${hosting_url}/callback?success=true`);
       } else
       {
-        res.redirect("http://localhost:5173/callback?success=false");
+        res.redirect(`${hosting_url}/callback?success=false`);
       }
     } catch (error) {
       console.error('Error getting access token:', error.response ? error.response.data : error.message);
-      res.redirect("http://localhost:5173/callback?success=false");
+      res.redirect(`${hosting_url}/callback?success=false`);
     }
   };
 
