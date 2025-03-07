@@ -28,9 +28,6 @@ const sessionOptions = {
     }
 };
 
-const domain = process.env.NODE_SERVER_DOMAIN ? process.env.NODE_SERVER_DOMAIN.trim() : ""
-console.log("THIS IS MY DOMAIN: ", domain);
-
 if (process.env.NODE_ENV !== "development") {
     sessionOptions.proxy = true;
     sessionOptions.cookie = {
@@ -41,6 +38,7 @@ if (process.env.NODE_ENV !== "development") {
         domain: process.env.NODE_SERVER_DOMAIN,
     };
 }
+
 app.use(session(sessionOptions));
 app.use(express.json());
 
