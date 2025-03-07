@@ -5,6 +5,7 @@ import refreshAccessToken from '../tokenManager.js'
 export default function UserRoutes(app) {
   const spotify_client_id = process.env.SPOTIFY_CLIENT_ID;
   const spotify_client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+  const node_server_domain = process.env.NODE_SERVER_DOMAIN;
   const TOP_TYPES = new Set("artists", "tracks");
 
   const getUserProfile = async (req, res, firstCall = true) => {
@@ -77,7 +78,7 @@ export default function UserRoutes(app) {
 
     params.append("client_id", spotify_client_id);
     params.append("response_type", "code");
-    params.append("redirect_uri", "http://localhost:5000/callback");
+    params.append("redirect_uri", `${node_server_domain}/callback`);
     params.append("scope", "user-read-private user-read-email playlist-read-private user-top-read playlist-modify-public playlist-modify-private");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
@@ -97,7 +98,7 @@ export default function UserRoutes(app) {
       params.append("client_id", spotify_client_id);
       params.append("grant_type", "authorization_code");
       params.append("code", code);
-      params.append("redirect_uri", "http://localhost:5000/callback");
+      params.append("redirect_uri", `${node_server_domain}/callback`);
       params.append("code_verifier", verifier);
 
       const response = await axios.post(
